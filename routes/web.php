@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\OTPService;
 use Illuminate\Support\Facades\Route;
 
 /*
