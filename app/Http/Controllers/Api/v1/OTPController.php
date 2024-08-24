@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Services\OTPService;
+use App\Services\OTPActivation\ActivationService;
+use App\Services\OTPActivation\EmailOTPActivation;
 use App\Traits\ApiResponse;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,17 +15,17 @@ class OTPController extends Controller
 {
     //
     use ApiResponse;
-    protected $otp_service;
-    public function __construct(OTPService $otp_service)
-    {
-        $this->otp_service = $otp_service;
-    }
+
 
     public function resend_otp()
     {
         try {
-            $phone = Cache::get('phone');
-            $this->otp_service->send_otp($phone);
+            $email = Cache::get('email');
+
+            Cache::forget('otp_' . $email);
+            $email_otp_activation = new EmailOTPActivation();
+            $activation_service = new ActivationService($email_otp_activation);
+            $activation_service->send_otp($email);
 
             $message = "Resend Verification Code successful";
             $status = 200;
@@ -44,17 +44,15 @@ class OTPController extends Controller
 
     public function verify_otp(Request $request)
     {
-        $user_id = Cache::get('user_id');
-        $user = User::find($user_id);
+        try {
+            $email_otp_activation = new EmailOTPActivation();
+            $activation_service = new ActivationService($email_otp_activation);
+            $activation_service->verify_otp($request->code);
 
-        $verification = $this->otp_service->otp_verification($request->code, $user->phone);
-        if ($verification->status === "approved") {
-            $user->is_active = true;
-            $user->activated_at = now();
-            $user->save();
-        } else {
-            dd("wrong");
+            return $this->successResponse(null, "Verified Successful", 200);
+        } catch (Exception $th) {
+            return $this->errorResponse($th->getMessage(), $th->getCode());
         }
-        return response()->json(["message" => "verified done"], 200);
+
     }
 }

@@ -1,16 +1,14 @@
 <?php
 namespace App\Services\Auth;
 use App\Models\User;
+use App\Services\OTPActivation\ActivationService;
+use App\Services\OTPActivation\EmailOTPActivation;
 use App\Services\OTPService;
 use Cache;
 
 class RegisterService
 {
-    protected $otp_service;
-    public function __construct(OTPService $otp_service)
-    {
-        $this->otp_service = $otp_service;
-    }
+
     public function sign_up($request)
     {
         $full_name = $request->input('full_name');
@@ -20,7 +18,7 @@ class RegisterService
 
         $user = $this->create_user($full_name, $email, $phone, $password);
         $this->cashe_user_data($user);
-        $this->send_otp($phone);
+        $this->send_otp($email);
 
         return [
             "message" => "Registerd Successful",
@@ -39,14 +37,19 @@ class RegisterService
         return $user;
     }
 
-    public function cashe_user_data($user)
+    protected function cashe_user_data($user)
     {
-        Cache::put("user_id", $user->id, 600);
-        Cache::put("phone", $user->phone, 600);
+        Cache::put("phone", $user->phone, 3600);
+        Cache::put("email", $user->email, 3600);
     }
 
-    public function send_otp($phone)
+    public function send_otp($email)
     {
-        $this->otp_service->send_otp($phone);
+        // well extend when we need to provide sms activation
+
+
+        $email_otp_activation = new EmailOTPActivation();
+        $activation_service = new ActivationService($email_otp_activation);
+        $activation_service->send_otp($email);
     }
 }
