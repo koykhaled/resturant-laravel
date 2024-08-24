@@ -13,7 +13,7 @@ class LoginService
     public function authenticate($request)
     {
         $credentials = $request->only('email', 'password');
-        $user = User::whereEmail($request->email)->first();
+        $user = User::with('addresses')->whereEmail($request->email)->first();
 
         if (!$user) {
             throw new UserNotFoundException();

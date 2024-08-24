@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('full_name');
             $table->string('email')->unique();
             $table->string('phone')->unique();
+            $table->string('avatar')->nullable();
             $table->boolean('is_active')->default(0);
             $table->timestamp('activated_at')->nullable();
             $table->string('password');
