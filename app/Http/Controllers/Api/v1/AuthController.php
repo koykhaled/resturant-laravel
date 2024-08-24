@@ -34,6 +34,7 @@ class AuthController extends Controller
 
             return $this->successResponse(null, $register['message'], $register['status']);
         } catch (ValidationException $th) {
+            DB::rollBack();
             return $this->errorResponse($th->getMessage(), 400);
 
         } catch (Exception $th) {

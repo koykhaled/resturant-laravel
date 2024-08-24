@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\OTPController;
+use App\Http\Controllers\Api\v1\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +24,9 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('verify', [OTPController::class, 'verify_otp'])->name('otp_verification');
     Route::post('resend-otp', [OTPController::class, 'resend_otp'])->name('resend_otp');
 
-    Route::middleware('auth:api')->group(function () {
-        Route::get('users/me', [AuthController::class, 'me'])->name('testing');
-    });
+});
+
+
+Route::group(['prefix' => 'users', 'middleware' => ['auth:api']], function () {
+    Route::patch('', [UserController::class, 'update'])->name('update');
 });
