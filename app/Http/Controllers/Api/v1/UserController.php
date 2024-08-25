@@ -8,8 +8,7 @@ use App\Services\User\UpdateService;
 use App\Traits\ApiResponse;
 use DB;
 use Exception;
-use Illuminate\Http\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
+
 
 class UserController extends Controller
 {

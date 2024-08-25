@@ -31,7 +31,7 @@ class UpdateService
             Cache::put('email', $user->email);
             $email_otp_activation = new EmailOTPActivation();
             $activation_service = new ActivationService($email_otp_activation);
-            $activation_service->send_otp($email);
+            $activation_service->send_otp($user->email);
             $user->is_active = 0;
             $user->activated_at = null;
             $user->save();
